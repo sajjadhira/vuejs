@@ -28,7 +28,7 @@ Route::get('/customers', function () {
 });
 
 Route::get('/products', function () {
-    $items = \App\Models\Product::orderBy('id', 'desc')->get();
+    $items = \App\Models\Product::orderBy('id', 'asc')->get();
     return response()->json([
         'products' => $items
     ], 200);
