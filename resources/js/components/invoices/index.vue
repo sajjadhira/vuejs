@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue";
 import axios from 'axios';  // Ensure axios is imported
 
 let invoices = ref([]);
+let searchInvoice = ref([]);
 
 onMounted(async () => {
     await fetechInvoices();
@@ -10,7 +11,11 @@ onMounted(async () => {
 
 const fetechInvoices = async () => {
     let response = await axios.get("/api/invoices");
-    console.log('response', response);
+    invoices.value = response.data.invoices;
+};
+
+const search = async () => {
+    let response = await axios.get(`/api/invoices?q=${searchInvoice.value}`);
     invoices.value = response.data.invoices;
 };
 </script>
@@ -58,7 +63,7 @@ const fetechInvoices = async () => {
                     </div>
                     <div class="relative">
                         <i class="table--search--input--icon fas fa-search"></i>
-                        <input class="table--search--input" type="text" placeholder="Search invoice">
+                        <input class="table--search--input" type="text" placeholder="Search invoice" v-model="searchInvoice" @keyup="search()">
                     </div>
                 </div>
 
