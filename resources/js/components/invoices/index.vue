@@ -67,6 +67,7 @@ const search = async () => {
                     </div>
                 </div>
 
+                <div v-if="invoices.length > 0">
                 <div class="table--heading">
                     <p>ID</p>
                     <p>Date</p>
@@ -76,7 +77,6 @@ const search = async () => {
                     <p>Total</p>
                 </div>
 
-                <div v-if="invoices.length > 0">
                     <div class="table--items" v-for="item in invoices" :key="item.id">
                         <a href="#" class="table--items--transactionId">#{{item.id}}</a>
                         <p>{{item.date}}</p>
@@ -87,7 +87,9 @@ const search = async () => {
                     </div>
                 </div>
                 <div v-else>
-                    <p>No invoices found</p>
+                    <div class="text__center">
+                        <p>No invoices found</p>
+                    </div>
                 </div>
             </div>
         </div>

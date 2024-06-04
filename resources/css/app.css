@@ -604,3 +604,8 @@ ul {
 .grand__total--items span {
     font-size: 26px;
 }
+
+.text__center{
+    text-align: center;
+
+}
