@@ -26,4 +26,12 @@ class InvoiceController extends Controller
             'invoices' => $invoices
         ], 200);
     }
+
+
+    public function store(Request $request)
+    {
+        return response()->json([
+            'message' => 'store'
+        ], 200);
+    }
 }

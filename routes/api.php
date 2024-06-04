@@ -19,4 +19,20 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+Route::get('/customers', function () {
+    $customers = \App\Models\Customer::orderBy('id', 'desc')->get();
+    return response()->json([
+        'customers' => $customers
+    ], 200);
+});
+
+Route::get('/products', function () {
+    $items = \App\Models\Product::orderBy('id', 'desc')->get();
+    return response()->json([
+        'products' => $items
+    ], 200);
+});
+
 Route::get('/invoices', [InvoiceController::class, 'index']);
+Route::post('/invoices/store', [InvoiceController::class, 'store']);
