@@ -3,48 +3,57 @@ import axios from "axios";
 import { onMounted, ref } from "vue";
 import router from "../../router";
 
-
-let form = ref({
-    customer_id: "",
-    date: "",
-    due_date: "",
-    number: "",
-    reference: "",
-    discount: "",
-    terms: "",
-    subtotal: "",
-    grandtotal: ""
-});
-
+let form = ref({id:''});
 let customers = ref([]);
 let customer_id = ref([]);
 let items = ref([]);
-let carts = ref([]);
 let products = ref([]);
 const showModal = ref(false);
 const hideModal = ref(true);
 
-onMounted(async () => {
-    await fetechCustomers();
-});
+const props = defineProps({
+    id: {
+        type: String,
+        default: ''
+    }
+})
+
+const fetchInvoice = async(id) => {
+    let response = await axios.get(`/api/invoices/show/${id}`);
+    form.value = response.data.invoice;
+
+    console.log(response.data.invoice_items)
+    items.value = response.data.invoice_items;
+}
 
 const fetechCustomers = async () => {
     let response = await axios.get("/api/customers")
     customers.value = response.data.customers;
 };
 
+const removeInvoiceItem = (id, i) => {
+    items.value.splice(i, 1);
+    if (id) {
+        let res = axios.get(`/api/invoices/item/remove/${id}`);
+        console.log(res.data)
+    }
+}
+const fetechProducts = async () => {
+    let response = await axios.get("/api/products")
+    products.value = response.data.products;
+};
 
 const addCart = async (item) => {
 
     
     let cart = {
-        id: item.id,
-        item_code: item.item_code,
+        product_id: item.id,
+        product: {item_code: item.item_code},
         description: item.description,
         unit_price: item.unit_price,
-        quantity: item.quantity
+        quantity: item.quantity,
     }
-    carts.value.push(cart);
+    items.value.push(cart);
     closeModal();
 };
 
@@ -57,19 +66,10 @@ const closeModal = () => {
     showModal.value = !hideModal.value;
 }
 
-const fetechProducts = async () => {
-    let response = await axios.get("/api/products")
-    products.value = response.data.products;
-};
-
-
-const removeCart = (index) => {
-    carts.value.splice(index, 1);
-};
 
 const subTotal = () => {
     let total = 0;
-    carts.value.forEach(cart => {
+    items.value.forEach(cart => {
         total += cart.unit_price * cart.quantity;
     });
 
@@ -101,9 +101,9 @@ const Total = () => {
 };
 
 
-const onSave = async () => {
+const onEdit = async (id) => {
 
-    if (carts.value.length === 0) {
+    if (items.value.length === 0) {
         alert("Please add items to the invoice");
         return;
     }
@@ -122,9 +122,9 @@ const onSave = async () => {
     }
 
     const formData = new FormData();
-    if (Array.isArray(carts.value)) {
-    formData.append("invoice_items", JSON.stringify(carts.value));
-    formData.append("customer_id", customer_id.value);
+    if (Array.isArray(items.value)) {
+    formData.append("invoice_items", JSON.stringify(items.value));
+    formData.append("customer_id", form.value.customer_id);
     formData.append("date", form.value.date);
     formData.append("due_date", form.value.due_date);
     formData.append("number", form.value.number);
@@ -132,35 +132,35 @@ const onSave = async () => {
     formData.append("discount", form.value.discount);
     formData.append("subtotal", subtotal);
     formData.append("total", total);
-    formData.append("terms_and_conditions", form.value.terms);
+    formData.append("terms_and_conditions", form.value.terms_and_conditions);
 } else {
   // Handle the case where carts.value is not an array (e.g., show an error message)
   alert("Invoice is not ready to be saved. Please add items to the invoice.");
     return;
 }
-    let response = await axios.post("/api/invoices/store", formData);
 
-    console.log(response.data);
-    carts.value = [];
+    let response = await axios.post(`/api/invoices/update/${id}`, formData);
+    items.value = [];
+    console.log(response.data)
     router.push('/');
-};
+}
 
+
+onMounted(async () => {
+    await fetchInvoice(props.id);
+    await fetechCustomers();
+})
 </script>
-
 
 <template>
     <div class="container">
-      <div class="invoices">
+  <div class="invoices">
         
         <div class="card__header">
-            <div class="text__center">
-
-                <h1>
-                    <router-link to="/" class="brand__link">Home</router-link>
-                </h1>
-                </div>
-                <div>
-                <h2 class="invoice__title">New Invoice</h2>
+            <div>
+                <h2 class="invoice__title">Edit Invoice</h2>
+            </div>
+            <div>
                 
             </div>
         </div>
@@ -169,7 +169,7 @@ const onSave = async () => {
             <div class="card__content--header">
                 <div>
                     <p class="my-1">Customer</p>
-                    <select name="" id="" class="input" v-model="customer_id" placeholder="Select Customer">
+                    <select name="" id="" class="input" v-model="form.customer_id" placeholder="Select Customer">
                         <option disabled>Select Customer</option>
                         <option v-for="customer in customers" :key="customer.id" :value="customer.id">{{customer.firstname}} {{ customer.lastname }}</option>
                     </select>
@@ -199,19 +199,18 @@ const onSave = async () => {
                 </div>
     
                 <!-- item 1 -->
-                <div class="table--items2" v-for="(cart,i) in carts" :key="cart.id">
-                    <p>{{cart.id }} # {{ cart.item_code }}</p>
+                <div class="table--items2" v-for="(cart,i) in items" :key="cart.id">
+                    <p v-if="cart.product">#{{ cart.product.item_code }}</p>
                     <p>
                         <input type="text" class="input" v-model="cart.unit_price">
                     </p>
                     <p>
                         <input type="text" class="input" v-model="cart.quantity">
                     </p>
-                    <p v-if="cart.quantity">
-                        $ {{ (cart.unit_price * cart.quantity).toFixed(2) }}
+                    <p>
+                        $ {{ (cart.quantity * cart.unit_price).toFixed(2) === 'NaN' ? 0 : (cart.quantity * cart.unit_price).toFixed(2)}}
                     </p>
-                    <p v-else></p>
-                    <p style="color: red; font-size: 24px;cursor: pointer;" @click="removeCart(i)">
+                    <p style="color: red; font-size: 24px;cursor: pointer;" @click="removeInvoiceItem(cart.id,i)">
                         &times;
                     </p>
                 </div>
@@ -223,7 +222,7 @@ const onSave = async () => {
             <div class="table__footer">
                 <div class="document-footer" >
                     <p>Terms and Conditions</p>
-                    <textarea cols="50" rows="7" class="textarea" v-model="form.terms"></textarea>
+                    <textarea cols="50" rows="7" class="textarea" v-model="form.terms_and_conditions"></textarea>
                 </div>
                 <div>
                     <div class="table__footer--subtotal">
@@ -248,14 +247,17 @@ const onSave = async () => {
                 
             </div>
             <div>
-                <a class="btn btn-secondary" @click="onSave()">
+                <a class="btn btn-secondary" @click="onEdit(form.id)">
                     Save
                 </a>
+
+                <router-link to="/" class="btn btn-secondary link__decoration">Go Home</router-link>
             </div>
         </div>
         
     </div>
 
+    
       <!--==================== add modal items ====================-->
     <div class="modal main__modal " :class="{show: showModal}">
         <div class="modal__content">
@@ -282,7 +284,6 @@ const onSave = async () => {
             </div>
         </div>
     </div>
-    
-    <br><br><br>
     </div>
+
 </template>

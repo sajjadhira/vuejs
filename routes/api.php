@@ -38,3 +38,5 @@ Route::get('/invoices', [InvoiceController::class, 'index']);
 Route::post('/invoices/store', [InvoiceController::class, 'store']);
 
 Route::get('/invoices/show/{id}', [InvoiceController::class, 'show']);
+Route::get('/invoices/item/remove/{id}', [InvoiceController::class, 'removeItem']);
+Route::post('/invoices/update/{id}', [InvoiceController::class, 'update']);

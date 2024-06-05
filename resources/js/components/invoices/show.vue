@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import { onMounted, ref } from "vue";
+import router from "../../router";
 
 let form = ref({
     id: ""
@@ -27,6 +28,15 @@ const fetchInvoice = async(id) => {
 const print = () => {
     window.print();
     router.push('/').cache(() => {})
+}
+
+const onEdit = (id) => {
+    // router.push(`/invoices/edit/${id}`);
+    router.push(`/invoices/edit/${id}`);
+}
+
+const goHome = () => {
+    router.push('/');
 }
 
 onMounted(async () => {
@@ -56,6 +66,14 @@ onMounted(async () => {
                 <ul  class="card__header-list">
                     <li>
                         <!-- Select Btn Option -->
+                        <button class="selectBtnFlat" @click="goHome()">
+                            <i class="fas fa-print"></i>
+                            Home
+                        </button>
+                        <!-- End Select Btn Option -->
+                    </li>
+                    <li>
+                        <!-- Select Btn Option -->
                         <button class="selectBtnFlat" @click="print()">
                             <i class="fas fa-print"></i>
                             Print
@@ -64,10 +82,13 @@ onMounted(async () => {
                     </li>
                     <li>
                         <!-- Select Btn Option -->
-                        <button class="selectBtnFlat">
+                        <button class="selectBtnFlat" @click="onEdit(form.id)">
                             <i class=" fas fa-reply"></i>
                             Edit
                         </button>
+                        <!-- End Select Btn Option -->
+                    </li>
+                    <li>
                         <!-- End Select Btn Option -->
                     </li>
                     <li>
@@ -189,10 +210,8 @@ onMounted(async () => {
                 
             </div>
             <div>
-                <a class="btn btn-secondary">
-                    Save
-                </a>
 
+    
                 <router-link to="/" class="btn btn-secondary link__decoration">Go Home</router-link>
             </div>
         </div>
