@@ -40,3 +40,31 @@ Route::post('/invoices/store', [InvoiceController::class, 'store']);
 Route::get('/invoices/show/{id}', [InvoiceController::class, 'show']);
 Route::get('/invoices/item/remove/{id}', [InvoiceController::class, 'removeItem']);
 Route::post('/invoices/update/{id}', [InvoiceController::class, 'update']);
+Route::get('/invoices/delete/{id}', [InvoiceController::class, 'destroy']);
+
+Route::get('/invoices/last', function () {
+    $invoice = \App\Models\Invoice::orderBy('id', 'desc')->first();
+    return response()->json([
+        'invoice' => $invoice,
+        'date' => date('Y-m-d'),
+        'due_date' => date('Y-m-d', strtotime('+30 days')),
+        'discount' => 0,
+        'reference' => 'INV-' . date('Ymd') . '-' . ($invoice->id + 1),
+        'terms' => 'Payment due in 30 days'
+    ], 200);
+});
+// customers
+
+Route::get('/customers', function () {
+    $customers = \App\Models\Customer::orderBy('id', 'desc')->get();
+    return response()->json([
+        'customers' => $customers
+    ], 200);
+});
+
+Route::post('/customers/store', function (Request $request) {
+    $customer = \App\Models\Customer::create($request->all());
+    return response()->json([
+        'customer' => $customer
+    ], 200);
+});

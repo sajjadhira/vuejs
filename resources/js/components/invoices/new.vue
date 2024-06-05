@@ -6,12 +6,6 @@ import router from "../../router";
 
 let form = ref({
     customer_id: "",
-    date: "",
-    due_date: "",
-    number: "",
-    reference: "",
-    discount: "",
-    terms: "",
     subtotal: "",
     grandtotal: ""
 });
@@ -26,8 +20,19 @@ const hideModal = ref(true);
 
 onMounted(async () => {
     await fetechCustomers();
+    await fetechLastInvoice();
 });
 
+
+const fetechLastInvoice = async () => {
+    let response = await axios.get("/api/invoices/last");
+    form.value.number = response.data.invoice.id + 1;
+    form.value.date = response.data.date;
+    form.value.due_date = response.data.due_date;
+    form.value.reference = response.data.reference;
+    form.value.terms = response.data.terms;
+    form.value.discount = response.data.discount;
+};
 const fetechCustomers = async () => {
     let response = await axios.get("/api/customers")
     customers.value = response.data.customers;
@@ -100,6 +105,9 @@ const Total = () => {
     return total.toFixed(2);
 };
 
+const newCustomer = () => {
+    router.push('/customers/new');
+};
 
 const onSave = async () => {
 
@@ -173,6 +181,8 @@ const onSave = async () => {
                         <option disabled>Select Customer</option>
                         <option v-for="customer in customers" :key="customer.id" :value="customer.id">{{customer.firstname}} {{ customer.lastname }}</option>
                     </select>
+
+                    <button class="btn btn-new" @click="newCustomer()">New Customer</button>
                 </div>
                 <div>
                     <p class="my-1">Date</p> 

@@ -132,4 +132,14 @@ class InvoiceController extends Controller
             'message' => 'Invoice updated successfully'
         ], 200);
     }
+
+    public function destroy($id)
+    {
+        $invoice = \App\Models\Invoice::find($id);
+        $invoice->delete();
+        return response()->json([
+            'success' => true, // to handle the response in the frontend to show a success message 'Invoice deleted successfully
+            'message' => 'Invoice deleted successfully'
+        ], 200);
+    }
 }

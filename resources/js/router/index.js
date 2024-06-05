@@ -5,6 +5,7 @@ import notFound from "../components/notFound.vue";
 import newInvoice from "../components/invoices/new.vue";
 import showInvoice from "../components/invoices/show.vue";
 import editInvoice from "../components/invoices/edit.vue";
+import newCustomer from "../components/customers/new.vue";
 
 
 
@@ -12,6 +13,10 @@ const routes = [
     {
         path: "/",
         component: invoices,
+    },
+    {
+        path: '/customers/new',
+        component: newCustomer,
     },
     {
         path: "/invoices/new",

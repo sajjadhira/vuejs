@@ -27,7 +27,7 @@ const fetchInvoice = async(id) => {
 
 const print = () => {
     window.print();
-    router.push('/').cache(() => {})
+    // router.push('/').cache(() => {})
 }
 
 const onEdit = (id) => {
@@ -39,6 +39,14 @@ const goHome = () => {
     router.push('/');
 }
 
+
+const deleteInvoice = async (id) => {
+    let response = await axios.get(`/api/invoices/delete/${id}`);
+    if (response.data.success) {
+        router.push('/');
+    }
+}
+
 onMounted(async () => {
     await fetchInvoice(proprs.id);
 });
@@ -46,9 +54,9 @@ onMounted(async () => {
 
 <template>
     <div class="container">
-            <div class="invoices">
+    <div class="invoices">
         
-        <div class="card__header">
+        <div class="card__header no-print">
             <div>
                 <h2 class="invoice__title">Invoice</h2>
             </div>
@@ -57,12 +65,11 @@ onMounted(async () => {
             </div>
         </div>
         <div>
-            <div class="card__header--title ">
+            <div class="card__header--title no-print">
                 <h1 class="mr-2">#{{ form.id }}</h1>
-                <p>{{ form.created_at }}</p>
             </div>
     
-            <div>
+            <div class="no-print">
                 <ul  class="card__header-list">
                     <li>
                         <!-- Select Btn Option -->
@@ -93,7 +100,7 @@ onMounted(async () => {
                     </li>
                     <li>
                         <!-- Select Btn Option -->
-                        <button class="selectBtnFlat ">
+                        <button class="selectBtnFlat " @click="deleteInvoice(form.id)">
                             <i class=" fas fa-pencil-alt"></i>
                             Delete
                         </button>
@@ -104,7 +111,7 @@ onMounted(async () => {
             </div>
         </div>
 
-        <div class="table invoice">
+        <div class="table invoice print">
             <div class="logo">
                 <!-- <img src="assets/img/logo.png" alt="" style="width: 200px;"> -->
             </div>
@@ -144,9 +151,9 @@ onMounted(async () => {
             <div v-if="items.length > 0">
             <div class="table py1">
 
-                <div class="table--heading3">
+                <div class="table--heading3 print__heading">
                     <p>#</p>
-                    <p>Item Description</p>
+                    <p>Item Code</p>
                     <p>Unit Price</p>
                     <p>Qty</p>
                     <p>Total</p>
@@ -154,7 +161,7 @@ onMounted(async () => {
     
                 <!-- item 1 -->
                 <div class="table--items3" v-for="item in items" :key="item.id">
-                    <p>{{ item.id }}</p>
+                    <p># {{ item.id }}</p>
                     <p v-if="item.product">{{ item.product.item_code }}</p>
                     <p>$ {{ item.unit_price }}</p>
                     <p>{{ item.quantity }}</p>
@@ -205,7 +212,7 @@ onMounted(async () => {
             </div>
 
         </div>
-        <div class="card__footer">
+        <div class="card__footer no-print">
             <div>
                 
             </div>
@@ -218,6 +225,5 @@ onMounted(async () => {
         
     </div>
 
-    <br><br><br>
     </div>
 </template>
