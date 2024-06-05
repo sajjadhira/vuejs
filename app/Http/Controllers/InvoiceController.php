@@ -68,4 +68,15 @@ class InvoiceController extends Controller
             'message' => 'Invoice created successfully'
         ], 201);
     }
+
+
+    public function show($id)
+    {
+        $invoice = \App\Models\Invoice::with('customer')->find($id);
+        $invoiceItems = \App\Models\InvoiceItem::with('product')->where('invoice_id', $id)->get();
+        return response()->json([
+            'invoice' => $invoice,
+            'invoice_items' => $invoiceItems
+        ], 200);
+    }
 }

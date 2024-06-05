@@ -27,6 +27,12 @@ const newInvoice = async () => {
 // Add your new invoice logic here
     router.push('/invoices/new');
 };
+
+
+const onShow = async (id) => {
+    router.push(`/invoices/show/${id}`);
+};
+
 </script>
 
 <template>
@@ -87,7 +93,7 @@ const newInvoice = async () => {
                 </div>
 
                     <div class="table--items" v-for="item in invoices" :key="item.id">
-                        <a href="#" class="table--items--transactionId">#{{item.id}}</a>
+                        <a href="#" class="table--items--transactionId" @click="onShow(item.id)">#{{item.id}}</a>
                         <p>{{item.date}}</p>
                         <p>#{{item.number}}</p>
                         <p>{{item.customer.firstname}}</p>

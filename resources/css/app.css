@@ -613,3 +613,11 @@ ul {
     color: #FFF;
     text-decoration: none;
 }
+.a__link{
+    text-decoration: none;
+    color: #FFF;
+    font-size: 20px;
+}
+.link__decoration{
+    text-decoration: none;
+}
